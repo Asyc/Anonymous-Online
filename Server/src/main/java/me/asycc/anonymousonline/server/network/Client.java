@@ -1,6 +1,8 @@
 package me.asycc.anonymousonline.server.network;
 
-import com.sun.xml.internal.ws.api.message.Packet;
+import me.asycc.anonymousonline.common.network.Packet;
+import me.asycc.anonymousonline.common.network.impl.HandshakePacket;
+import me.asycc.anonymousonline.common.network.impl.RSAPacket;
 import me.asycc.anonymousonline.common.utils.EncryptionUtils;
 import me.asycc.anonymousonline.common.utils.SerializationUtils;
 
@@ -8,10 +10,15 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
+import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
 /**
+ *
+ * A class to abstract {@link Socket} functions, as well as read for incoming bytes from the {@link Socket}
+ * and pass them to the {@link me.asycc.anonymousonline.server.event.EventHandler}
+ *
  * @author Asyc
  * @since 3/4/2019
  */
@@ -33,10 +40,53 @@ public class Client {
     private PrivateKey privateKey;
 
     /**
+     * The amount of bytes to allocate to a {@link KeyPair} as well as
+     * the amount of bytes to allocate to a byte array when reading from
+     * the socket's input stream.
+     */
+    private final int size = 1024;
+
+    /**
+     * The clients chosen nickname.
+     */
+    private String nickname;
+
+    /**
      * @param socket The client's socket used for I/O
      */
     public Client(Socket socket){
         this.socket = socket;
+
+        try {
+            Packet packet = this.read();
+
+            if(packet instanceof RSAPacket){
+                this.publicKey = ((RSAPacket) packet).getKey();
+                KeyPair pair = EncryptionUtils.generateKeyPair(size);
+                this.privateKey = pair.getPrivate();
+                this.send(new RSAPacket(pair.getPublic()));
+            }
+
+            packet = this.read();
+
+            if(packet instanceof HandshakePacket){
+
+
+
+                this.nickname = ((HandshakePacket) packet).getNickname();
+            }
+
+        }catch (IOException e){
+            System.err.println("Could not read from client, disconnecting.");
+            disconnect();
+            return;
+        }catch (GeneralSecurityException e){
+            System.err.println("Could not generate encryption keypair, disconnecting.");
+            disconnect();
+            return;
+        }
+
+        //todo : stuff
     }
 
     /**
@@ -50,14 +100,13 @@ public class Client {
      * received packet could not be deserialized
      */
     public Packet read() throws IOException {
-        byte[] readBytes = new byte[1024];
-        ByteBuffer buf = null;
+        byte[] readBytes = new byte[size];
         int result = socket.getInputStream().read(readBytes);
 
         if(result == 0){
             return null;
         }else if(result == -1){
-            //EOF has been reached, so disconnect.
+            //EOS has been reached, so disconnect.
             disconnect();
         }
 
@@ -100,7 +149,9 @@ public class Client {
         socket.getOutputStream().write(encrypted);
     }
 
-    //todo : write documentation
+    /**
+     * Closes the {@link Socket} connection between the server and the client and sending a disconnect packet.
+     */
     private void disconnect(){
         try{
             socket.close();

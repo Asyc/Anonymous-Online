@@ -2,15 +2,28 @@ package me.asycc.anonymousonline.server.main;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import me.asycc.anonymousonline.common.utils.Version;
+import me.asycc.anonymousonline.server.event.EventHandler;
+import me.asycc.anonymousonline.server.network.Client;
+import me.asycc.seb.EventBus;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
+ *
+ * The server class, containing all the instances of objects, users, etc.
+ *
  * @author Asyc
  * @since 3/4/2019
  */
@@ -22,18 +35,35 @@ public class Server extends Application {
     public static volatile Server instance;
 
     /**
+     * The {@link EventBus} that will be used as an event manager
+     * throughout this project.
+     */
+    public static volatile EventBus EVENT_BUS = new EventBus();
+
+    /**
      * The socket to run the server on
      */
-    private ServerSocket socket;
-
-
+    private volatile ServerSocket socket;
 
     /**
      * If this is set to true, no gui
      * will appear on screen.
      */
-    private boolean nogui = false;
+    private boolean noGUI = false;
 
+    /**
+     * A map of all the users connected the servers. The key is the user's id, which is the order
+     * they joined the server, and the {@link Client} object.
+     */
+    private volatile Map<Integer, Client> clientMap = Collections.synchronizedMap(new LinkedHashMap<>());
+
+    /**
+     * An array of {@link Version} signifying the acceptable versions where the server can make a successful
+     * connection with the client without error.
+     */
+    private final Version[] acceptableVersions = new Version[]{
+            new Version(1, 0, 0),
+    };
 
     /**
      * The "main" method to start the server
@@ -42,8 +72,28 @@ public class Server extends Application {
      */
     @Override
     public void start(Stage primaryStage) {
+        EVENT_BUS.register(new EventHandler());
 
-        Platform.exit();
+        try{
+            this.startServer();
+        }catch (IOException e){
+            showError("Unable to start server", e.getMessage());
+        }
+
+        if(!noGUI){
+            Pane pane;
+
+            try{
+                pane = FXMLLoader.load(this.getClass().getResource("/gui.fxml"));
+            }catch (IOException e){
+                e.printStackTrace();
+                Platform.exit();
+                return;
+            }
+
+            Scene scene = new Scene(pane);
+            primaryStage.setScene(scene);
+        }
     }
 
     /**
@@ -51,7 +101,7 @@ public class Server extends Application {
      * are specified, the server will be bound to the {@link InetAddress#getLocalHost()}
      * and the default port(42069)
      */
-    private void startServer() throws IOException {
+    private void startServer() throws IOException{
 
         InetAddress address = null;
         int port = 42069;
@@ -62,7 +112,7 @@ public class Server extends Application {
             String arg = getParameters().getRaw().get(i);
 
             if(arg.equalsIgnoreCase("nogui")){
-                nogui = true;
+                noGUI = true;
                 i++;
             }else if(arg.equalsIgnoreCase("-ip")){
                 try{
@@ -111,7 +161,7 @@ public class Server extends Application {
      * @param content The content text to display in the {@link Alert}
      */
     public static void showError(String header, String content){
-        if(!Server.instance.nogui){
+        if(!Server.instance.noGUI){
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText(header);
@@ -127,5 +177,19 @@ public class Server extends Application {
      */
     public ServerSocket getSocket() {
         return socket;
+    }
+
+    /**
+     * @return Returns {@link Server#clientMap}
+     */
+    public Map<Integer, Client> getClientMap() {
+        return clientMap;
+    }
+
+    /**
+     * @return Returns {@link Server#acceptableVersions}
+     */
+    public Version[] getAcceptableVersions() {
+        return acceptableVersions;
     }
 }
