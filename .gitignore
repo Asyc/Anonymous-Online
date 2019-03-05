@@ -1,0 +1,15 @@
+.idea/
+Client/.gradle/
+Client/settings.gradle
+Client/out/
+Client/build/
+
+Common/.gradle/
+Common/settings.gradle
+Common/out/
+Common/build/
+
+Server/.gradle/
+Server/settings.gradle
+Server/out/
+Server/build/

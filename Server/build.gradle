@@ -1,0 +1,16 @@
+plugins {
+    id 'java'
+}
+
+group 'me.asycc'
+version '1.0.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'me.asycc', name: 'Simple-Event-Bus', version: '2.0.0'
+}
