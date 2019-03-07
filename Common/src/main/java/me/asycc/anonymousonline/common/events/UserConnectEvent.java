@@ -1,4 +1,4 @@
-package me.asycc.anonymousonline.server.event.events;
+package me.asycc.anonymousonline.common.events;
 
 /**
  * An event class used to store information about a user disconnecting

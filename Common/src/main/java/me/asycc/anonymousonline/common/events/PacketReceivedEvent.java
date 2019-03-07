@@ -1,4 +1,4 @@
-package me.asycc.anonymousonline.server.event.events;
+package me.asycc.anonymousonline.common.events;
 
 import me.asycc.anonymousonline.common.network.Packet;
 

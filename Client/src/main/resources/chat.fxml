@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="781.0" prefWidth="524.0" style="-fx-background-color: #282828;" styleClass="\@Style.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TextArea id="TextArea" editable="false" layoutX="22.0" layoutY="175.0" prefHeight="581.0" prefWidth="481.0" style="-fx-background-color: #111111; -fx-border-color: #B2B2B2;" styleClass="\@Style.css" stylesheets="@Style.css" text="Welcome to Anonymous Online! IP addresses are not logged, all users are completely &#10;anonymous. All chat history is wiped once the user's chat server is shutdown.&#10;&#10;Anonymous Online is not responsible for any illegal activity. It is recommended that &#10;extra safety measures are taken to ensure complete anonymity.&#10;&#10;&#10;&#10;&#10;" />
+      <TextField id="TextField" layoutX="43.0" layoutY="708.0" prefHeight="31.0" prefWidth="320.0" promptText="Type message..." style="-fx-background-color: #111111; -fx-border-color: #919191; -fx-text-fill: #B2B2B2; -fx-prompt-text-fill: #5E5E5E;" stylesheets="@Style.css" />
+      <Button id="btnMessage" layoutX="377.0" layoutY="708.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="101.0" style="-fx-background-color: #111111; -fx-border-color: #919191;" text="Send Message" textFill="#b2b2b2" />
+      <ImageView id="imagelogo" fitHeight="127.0" fitWidth="147.0" layoutX="29.0" layoutY="28.0" opacity="0.7" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@/LOGO2.png" />
+         </image>
+      </ImageView>
+   </children>
+</Pane>

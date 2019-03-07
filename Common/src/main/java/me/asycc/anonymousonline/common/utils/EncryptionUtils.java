@@ -33,6 +33,7 @@ public class EncryptionUtils {
      * @throws GeneralSecurityException Thrown if there is an issue decrypting the byte array.
      */
     public static byte[] decrypt(PrivateKey key, final byte[] bytes) throws GeneralSecurityException {
+        if(key == null) return bytes;
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.ENCRYPT_MODE, key);
         return cipher.doFinal(bytes);
@@ -46,6 +47,7 @@ public class EncryptionUtils {
      * @throws GeneralSecurityException Thrown if there is an issue encrypting the byte array.
      */
     public static byte[] encrypt(final PublicKey key, final byte[] bytes) throws GeneralSecurityException{
+        if(key == null) return bytes;
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.ENCRYPT_MODE, key);
         return cipher.doFinal(bytes);
